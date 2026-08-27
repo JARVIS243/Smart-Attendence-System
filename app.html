@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Attendance System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1D3B32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SAS">
+<!-- Third-party libs (classic scripts, must load before app.js runs) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div id="loadingScreen">Loading Smart Attendance System…</div>
+
+<button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+<div class="overlay-scrim" id="scrim"></div>
+
+<div class="app" id="appShell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="mark">ROLL &middot; REGISTER &middot; REPORT</span>
+      <h1>Smart Attendance<br>System</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <!-- STUDENT -->
+      <button class="nav-item" data-role="student" data-view="s-dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</button>
+      <button class="nav-item" data-role="student" data-view="s-scan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg>Scan QR</button>
+      <button class="nav-item" data-role="student" data-view="s-history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>History</button>
+      <button class="nav-item" data-role="student" data-view="s-leave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Leave</button>
+      <button class="nav-item" data-role="student" data-view="s-timetable"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Timetable</button>
+      <button class="nav-item" data-role="student" data-view="s-profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>Profile</button>
+
+      <!-- FACULTY -->
+      <button class="nav-item" data-role="faculty" data-view="f-dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</button>
+      <button class="nav-item" data-role="faculty" data-view="f-session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Take Attendance</button>
+      <button class="nav-item" data-role="faculty" data-view="f-students"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Students</button>
+      <button class="nav-item" data-role="faculty" data-view="f-attendance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Attendance</button>
+      <button class="nav-item" data-role="faculty" data-view="f-leave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Leave Requests</button>
+      <button class="nav-item" data-role="faculty" data-view="f-reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg>Reports</button>
+      <button class="nav-item" data-role="faculty" data-view="f-subjects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Subjects</button>
+
+      <!-- ADMIN -->
+      <button class="nav-item" data-role="admin" data-view="a-dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</button>
+      <button class="nav-item" data-role="admin" data-view="a-departments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h1M14 9h1M9 13h1M14 13h1M9 17h1M14 17h1"/></svg>Departments</button>
+      <button class="nav-item" data-role="admin" data-view="a-classes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Classes</button>
+      <button class="nav-item" data-role="admin" data-view="a-students"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Students</button>
+      <button class="nav-item" data-role="admin" data-view="a-faculty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>Faculty</button>
+      <button class="nav-item" data-role="admin" data-view="a-subjects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Subjects</button>
+      <button class="nav-item" data-role="admin" data-view="a-records"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Records</button>
+      <button class="nav-item" data-role="admin" data-view="a-announcements"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-5v14L3 15v-4z"/><path d="M11.6 16.8a3 3 0 1 1-5.2-3"/></svg>Announcements</button>
+    </nav>
+    <div class="sidebar-foot">
+      <span id="sidebarVersion">v1.0 &middot; Firebase-backed</span>
+      <button id="installBtn" style="display:none; margin-top:10px;">Install app</button>
+      <div id="iosInstallHint" style="display:none; font-size:10.5px; line-height:1.5; margin-top:10px; color:rgba(244,241,230,0.7);">
+        Tap <strong>Share</strong> in Safari, then <strong>"Add to Home Screen"</strong> to install.
+      </div>
+      <button id="logoutBtn" style="margin-top:10px;">Log out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <span class="eyebrow" id="topEyebrow">Smart Attendance</span>
+        <h2 id="topTitle">Welcome</h2>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-round" id="themeToggle" title="Toggle theme">🌙</button>
+        <div class="notif-wrap">
+          <button class="icon-round" id="notifBell" title="Notifications">
+            🔔<span id="notifDot"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel"><div class="notif-list" id="notifList"></div></div>
+        </div>
+        <div class="user-chip">
+          <div class="avatar" id="userAvatar">?</div>
+          <div class="who"><b id="userNameLabel">—</b><span id="userRoleLabel">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ann-banner" id="announcementBanner">
+      <span id="annBannerText"></span>
+      <button id="annBannerClose">&times;</button>
+    </div>
+
+    <!-- ============ STUDENT VIEWS ============ -->
+    <section class="view" id="view-s-dashboard">
+      <div id="sDashWrap"></div>
+    </section>
+
+    <section class="view" id="view-s-scan">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Scan class QR code</h3><p>Ask your faculty to display the session QR, then scan it here.</p></div></div>
+        <div class="scan-frame">
+          <video id="scanVideo" muted playsinline></video>
+        </div>
+        <canvas id="scanCanvas" style="display:none;"></canvas>
+        <div style="margin-top:14px; display:flex; gap:10px;">
+          <button class="btn amber" id="scanStartBtn">Start camera</button>
+          <button class="btn secondary" id="scanStopBtn" style="display:none;">Stop</button>
+        </div>
+        <p class="muted" id="scanStatus" style="margin-top:12px; font-size:13.5px;"></p>
+        <div id="scanResult" style="margin-top:12px;"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-s-history">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Attendance history</h3><p>Every class you've been marked for.</p></div></div>
+        <div style="overflow-x:auto;">
+          <table class="report-table"><thead><tr><th>Date</th><th>Subject</th><th>Status</th><th>Method</th></tr></thead><tbody id="historyTableBody"></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-s-leave">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Apply for leave</h3><p>Your faculty will review and respond.</p></div></div>
+        <div class="field-row">
+          <div class="field"><label for="leaveFromDate">From</label><input type="date" id="leaveFromDate"></div>
+          <div class="field"><label for="leaveToDate">To</label><input type="date" id="leaveToDate"></div>
+        </div>
+        <div class="field"><label for="leaveReason">Reason</label><textarea id="leaveReason" placeholder="Briefly explain why you'll be away"></textarea></div>
+        <button class="btn amber" id="submitLeaveBtn">Submit request</button>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h3>Your requests</h3></div></div>
+        <div id="myLeavesList"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-s-timetable">
+      <div id="studentTimetableWrap"></div>
+    </section>
+
+    <section class="view" id="view-s-profile">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Your profile</h3></div></div>
+        <div class="ledger">
+          <div class="ledger-row"><span class="name" style="width:120px;">Name</span><span id="profileName" style="font-weight:700;"></span></div>
+          <div class="ledger-row"><span class="name" style="width:120px;">Email</span><span id="profileEmail"></span></div>
+          <div class="ledger-row"><span class="name" style="width:120px;">Roll number</span><span id="profileRoll"></span></div>
+          <div class="ledger-row"><span class="name" style="width:120px;">Class</span><span id="profileClassLabel"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FACULTY VIEWS ============ -->
+    <section class="view" id="view-f-dashboard">
+      <div id="fDashWrap"></div>
+    </section>
+
+    <section class="view" id="view-f-session">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Start a QR attendance session</h3><p>Generates a one-time QR code with GPS verification, expiry, and late detection.</p></div></div>
+        <div class="field"><label for="sessionSubjectSelect">Subject</label><select id="sessionSubjectSelect"></select></div>
+        <div class="session-config">
+          <div class="field"><label for="sessionRadius">GPS radius (m)</label><input type="number" id="sessionRadius" value="100" min="10"></div>
+          <div class="field"><label for="sessionDuration">QR expires (min)</label><input type="number" id="sessionDuration" value="10" min="1"></div>
+          <div class="field"><label for="sessionGraceMin">Late after (min)</label><input type="number" id="sessionGraceMin" value="10" min="1"></div>
+          <div class="field"><label for="sessionUseGps">GPS check</label>
+            <select id="sessionUseGps-placeholder" style="display:none;"></select>
+            <label style="display:flex; align-items:center; gap:8px; padding-top:6px; text-transform:none; font-family:var(--font-body); font-size:13.5px; color:var(--ink);"><input type="checkbox" id="sessionUseGps" checked style="width:16px; height:16px;"> Require location match</label>
+          </div>
+        </div>
+        <button class="btn amber" id="startSessionBtn">Generate QR &amp; start session</button>
+
+        <div id="activeSessionPanel" style="display:none; margin-top:22px;">
+          <div class="banner sage" style="display:flex; justify-content:space-between; align-items:center;">
+            <span><strong id="activeSessionSubject"></strong> — <span id="activeSessionExpiry"></span></span>
+            <button class="btn clay small" id="stopSessionBtn">End session</button>
+          </div>
+          <div class="qr-stage">
+            <div id="sessionQr"></div>
+            <div style="flex:1; min-width:220px;">
+              <p style="font-family:var(--font-mono); font-size:12.5px; color:var(--ink-soft); margin-bottom:8px;" id="sessionScanCount">0 scanned</p>
+              <div id="sessionScanList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Manual roll call (fallback)</h3><p>Mark attendance by hand for the subject and date above.</p></div></div>
+        <div class="inline-form">
+          <div class="field"><label for="manualMarkDate">Date</label><input type="date" id="manualMarkDate"></div>
+          <button class="btn amber small" id="saveManualBtn">Save register</button>
+        </div>
+        <div class="ledger" id="manualMarkLedger" data-existing="{}"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-f-students">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h3>Your students</h3><p>Across all classes you teach.</p></div>
+          <input type="text" id="facultyStudentSearch" class="select-student" placeholder="Search name or roll no.">
+        </div>
+        <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Roll</th><th>Name</th><th>Class</th><th>Email</th></tr></thead><tbody id="facultyStudentTableBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-f-attendance">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h3>Attendance records</h3><p>Edits require a short reason and are logged.</p></div>
+        </div>
+        <div class="inline-form">
+          <div class="field"><label for="attFilterSubject">Subject</label><select id="attFilterSubject"></select></div>
+          <div class="field"><label for="attFilterDate">Date</label><input type="date" id="attFilterDate"></div>
+        </div>
+        <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Date</th><th>Student</th><th>Subject</th><th>Status</th><th></th></tr></thead><tbody id="attTableBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-f-leave">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Leave requests</h3><p>From students in your classes.</p></div></div>
+        <div id="facultyLeaveList"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-f-reports">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h3>Attendance analytics</h3></div>
+          <div style="display:flex; gap:10px;">
+            <select class="select-student" id="reportSubjectSelect"></select>
+            <button class="btn secondary small" id="exportReportBtn">Export CSV</button>
+          </div>
+        </div>
+        <div style="max-width:320px; margin:0 auto 20px;"><canvas id="fReportChart"></canvas></div>
+        <div style="overflow-x:auto;"><table class="report-table"><thead><tr><th>Roll</th><th>Name</th><th>Attended</th><th>%</th></tr></thead><tbody id="fReportTableBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-f-subjects">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Add a subject</h3><p>Classes are created by your admin — pick one to attach this subject to.</p></div></div>
+        <div class="inline-form">
+          <div class="field"><label for="newSubjectName">Subject name</label><input type="text" id="newSubjectName" placeholder="e.g. Data Structures"></div>
+          <div class="field"><label for="newSubjectCode">Code</label><input type="text" id="newSubjectCode" placeholder="e.g. CS201"></div>
+          <div class="field"><label for="newSubjectClassSelect">Class</label><select id="newSubjectClassSelect"></select></div>
+          <button class="btn amber small" id="addSubjectBtn">Add subject</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h3>Your subjects</h3></div></div>
+        <div id="facultySubjectList"></div>
+      </div>
+    </section>
+
+    <!-- ============ ADMIN VIEWS ============ -->
+    <section class="view" id="view-a-dashboard">
+      <div id="aDashWrap"></div>
+    </section>
+
+    <section class="view" id="view-a-departments">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Departments</h3></div></div>
+        <div class="inline-form"><div class="field"><label for="newDeptName">New department</label><input type="text" id="newDeptName" placeholder="e.g. Computer Science"></div><button class="btn amber small" id="addDeptBtn">Add</button></div>
+        <div id="deptList"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-a-classes">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Classes</h3></div></div>
+        <div class="inline-form">
+          <div class="field"><label for="newClassName">Class name</label><input type="text" id="newClassName" placeholder="e.g. CS-3B"></div>
+          <div class="field"><label for="newClassDept">Department</label><select id="newClassDept"></select></div>
+          <div class="field"><label for="newClassSemester">Semester</label><input type="text" id="newClassSemester" placeholder="e.g. 5"></div>
+          <button class="btn amber small" id="addClassBtn">Add</button>
+        </div>
+        <div id="classList"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-a-students">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Students</h3><p>Assign each student to a class after they sign up.</p></div></div>
+        <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Roll</th><th>Name</th><th>Email</th><th>Class</th><th></th></tr></thead><tbody id="aStudentTableBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-a-faculty">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Faculty</h3></div></div>
+        <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Department</th><th></th></tr></thead><tbody id="aFacultyTableBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-a-subjects">
+      <div class="panel">
+        <div class="panel-head"><div><h3>All subjects</h3></div></div>
+        <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Subject</th><th>Code</th><th>Class</th><th>Faculty</th></tr></thead><tbody id="aSubjectTableBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-a-records">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h3>Complete attendance records</h3></div>
+          <button class="btn secondary small" id="exportRecordsBtn">Export CSV</button>
+        </div>
+        <div class="inline-form">
+          <div class="field"><label for="recFilterClass">Class</label><select id="recFilterClass"></select></div>
+          <div class="field"><label for="recFilterDate">Date</label><input type="date" id="recFilterDate"></div>
+        </div>
+        <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Date</th><th>Student</th><th>Subject</th><th>Status</th><th>Method</th></tr></thead><tbody id="recTableBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-a-announcements">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Post an announcement</h3></div></div>
+        <div class="field"><label for="annTitle">Title</label><input type="text" id="annTitle"></div>
+        <div class="field"><label for="annBody">Message</label><textarea id="annBody"></textarea></div>
+        <div class="field" style="max-width:220px;"><label for="annAudience">Audience</label>
+          <select id="annAudience"><option value="all">Everyone</option><option value="student">Students</option><option value="faculty">Faculty</option></select>
+        </div>
+        <button class="btn amber" id="postAnnBtn">Post announcement</button>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h3>Past announcements</h3></div></div>
+        <div id="announcementList"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Edit attendance modal (faculty) -->
+<div class="modal-overlay" id="editAttModal">
+  <div class="modal">
+    <h3>Edit attendance</h3>
+    <div class="field"><label for="editAttStatus">Status</label>
+      <select id="editAttStatus"><option value="present">Present</option><option value="late">Late</option><option value="absent">Absent</option></select>
+    </div>
+    <div class="field"><label for="editAttReason">Reason for change</label><textarea id="editAttReason" placeholder="Required — logged for authorization"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn secondary" id="cancelEditAttBtn">Cancel</button>
+      <button class="btn amber" id="saveEditAttBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastText"></span></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
