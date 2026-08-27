@@ -4,7 +4,7 @@
 // only same-origin static files get the cache-first treatment. Live
 // attendance data must always go straight to the network.
 
-const CACHE_NAME = "sas-shell-v2";
+const CACHE_NAME = "sas-shell-v1";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -20,6 +20,8 @@ const APP_SHELL = [
   "./js/student.js",
   "./js/faculty.js",
   "./js/admin.js",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
   "./icons/logo.png",
 ];
 
@@ -53,20 +55,18 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Network-first: always try to get the latest version of a file first.
-  // Only fall back to the cached copy if the device is offline / the
-  // request fails. This means updated files (like a new logo) show up
-  // immediately instead of being stuck behind a stale cache — the
-  // cache exists purely as an offline safety net, not a default source.
   event.respondWith(
-    fetch(req)
-      .then((res) => {
-        if (res && res.ok) {
-          const copy = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
-        }
-        return res;
-      })
-      .catch(() => caches.match(req))
+    caches.match(req).then((cached) => {
+      const network = fetch(req)
+        .then((res) => {
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          }
+          return res;
+        })
+        .catch(() => cached);
+      return cached || network;
+    })
   );
 });
