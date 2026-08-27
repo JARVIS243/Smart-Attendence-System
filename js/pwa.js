@@ -57,4 +57,3 @@ export function initInstallPrompt(buttonEl, iosHintEl) {
     deferredPrompt = null;
   });
 }
-
